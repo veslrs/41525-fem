@@ -1,0 +1,36 @@
+% Define a 3x3 matrix
+
+A = [1 2 0; 2 5 -1; 4 10 -1]
+
+
+% WHICH OF THE TWO LINES PRINTS THE FIRST ROW OF A, I.E. 1 2 0?
+% fprintf('%i %i %i\n',A(1,1),A(1,2),A(1,3));
+% fprintf('%i %i %i\n',A(0,0),A(0,1),A(0,2));
+
+% WHICH OF THE TWO LINES MULTIPLIES THE FIRST ROW OF A WITH 10?
+% A(:,1)=A(:,1)*10
+% A(1,:)=A(1,:)*10
+
+% WHICH OF THE TWO LINES DOES NOT GENERATE AN ERROR - AND WHY?
+% ' TRANSPOSES MATRICES AND VECTORS
+V=[1 2 3];
+% A*V
+% A*V'
+
+B=A';
+% WHAT IS THE DIFFERENCE BETWEEN THE TWO LINES BELOW?
+% C = A * B
+% C = A .* B
+
+V1=[1 1 1]; V2=[-1 1 0];
+% WHAT DO THESE VECTOR OPERATORS DO?
+% dot(V1,V2)
+% cross(V1,V2)
+% norm(V1)
+
+% WHAT DO YOU GET WITH THIS COMMAND? 
+% D=A(A>5)
+
+
+
+
