@@ -8,8 +8,8 @@ close all
 clc
 
 %--- Input file ----------------------------------------------------------%
-example1                % Input file
-%test1                   % Input file
+% example1                % Input file
+test1                   % Input file
 
 neqn = size(X,1)*size(X,2);         % Number of equations
 ne = size(IX,1);                    % Number of elements
@@ -32,7 +32,10 @@ stress=zeros(ne,1);                     % Element stress vector
 
 [Kmatr,P]=enforce(Kmatr,P,bound);           % Enforce boundary conditions
 
-                                            % Solve system of equations
+D = Kmatr \ P;                              % Solve system of equations
+
+disp(D);
+pause;
 
 [strain,stress]=recover(mprop,X,IX,D,ne,strain,stress); % Calculate element 
                                                         % stress and strain
@@ -81,26 +84,28 @@ for e=1:ne
     % index of dofs (for assembly)
     idx_dofs = [IX(e, 1) * 2 - 1, IX(e, 1) * 2, IX(e, 2) * 2 - 1, IX(e, 2) * 2];
     % assemble global stiffness matrix
-    K(idx_dofs(1):idx_dofs(2), idx_dofs(1):idx_dofs(2)) = k_elem(1:2, 1:2);
-    K(idx_dofs(1):idx_dofs(2), idx_dofs(3):idx_dofs(4)) = k_elem(1:2, 3:4);
-    K(idx_dofs(3):idx_dofs(4), idx_dofs(1):idx_dofs(2)) = k_elem(3:4, 1:2);
-    K(idx_dofs(3):idx_dofs(4), idx_dofs(3):idx_dofs(4)) = k_elem(3:4, 3:4);
+    K(idx_dofs(1):idx_dofs(2), idx_dofs(1):idx_dofs(2)) = K(idx_dofs(1):idx_dofs(2), idx_dofs(1):idx_dofs(2)) + k_elem(1:2, 1:2);
+    K(idx_dofs(1):idx_dofs(2), idx_dofs(3):idx_dofs(4)) = K(idx_dofs(1):idx_dofs(2), idx_dofs(3):idx_dofs(4)) + k_elem(1:2, 3:4);
+    K(idx_dofs(3):idx_dofs(4), idx_dofs(1):idx_dofs(2)) = K(idx_dofs(3):idx_dofs(4), idx_dofs(1):idx_dofs(2)) + k_elem(3:4, 1:2);
+    K(idx_dofs(3):idx_dofs(4), idx_dofs(3):idx_dofs(4)) = K(idx_dofs(3):idx_dofs(4), idx_dofs(3):idx_dofs(4)) + k_elem(3:4, 3:4);
 end
-disp(K)
-pause
 return
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Enforce boundary conditions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [K,P]=enforce(K,P,bound);
 
 % This subroutine enforces the support boundary conditions
 
-for i=1:size(bound,1)
-    disp('ERROR in fea/enforce: enforce boundary conditions')
-end
-
+function [K,P]=enforce(K,P,bound)
+    idx_dofs = ((bound(:, 1) - 1) * 2 + bound(:, 2)).';
+    K(idx_dofs, :) = 0;
+    K(:, idx_dofs) = 0;
+    for i = idx_dofs
+        K(i, i) = 1;
+    end
+    P(idx_dofs) = bound(:, 3);
 return
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%% Calculate element strain and stress %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,6 +113,8 @@ function [strain,stress]=recover(mprop,X,IX,D,ne,strain,stress)
 
 % This subroutine recovers the element stress, element strain, 
 % and nodal reaction forces
+
+
         
 for e=1:ne
     disp('ERROR in fea/recover: calculate strain and stress')
