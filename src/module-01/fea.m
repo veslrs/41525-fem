@@ -21,14 +21,17 @@ fprintf(1, "[INFO] Number of DOFs: %d\n", neqn);
 Kmatr=sparse(neqn,neqn);                % Stiffness matrix
 P=zeros(neqn,1);                        % Force vector
 D=zeros(neqn,1);                        % Displacement vector
+N=zeros(ne,1);                          % Element force vector
 R=zeros(neqn,1);                        % Residual vector
 strain=zeros(ne,1);                     % Element strain vector 
 stress=zeros(ne,1);                     % Element stress vector
+Ls = zeros(ne, 1);                      % Element initial lengths vector
+Bs = zeros(4, ne);                      % Collected strain displacement vectors
 
 %--- Calculate displacements ---------------------------------------------%
 [P]=buildload(X,IX,ne,P,loads,mprop);       % Build global load vector
 
-[Kmatr]=buildstiff(X,IX,ne,mprop,Kmatr);    % Build global stiffness matrix
+[Kmatr,Bs,Ls]=buildstiff(X,IX,ne,mprop,Kmatr,Ls,Bs);    % Build global stiffness matrix
 
 [Kmatr,P]=enforce(Kmatr,P,bound);           % Enforce boundary conditions
 
@@ -37,8 +40,14 @@ D = Kmatr \ P;                              % Solve system of equations
 disp(D);
 pause;
 
-[strain,stress]=recover(mprop,X,IX,D,ne,strain,stress); % Calculate element 
-                                                        % stress and strain
+[strain,stress,N,R]=recover(mprop,X,IX,D,ne,Bs,N,R,Ls,P,strain,stress); % Calculate element 
+                                                                        % stress and strain
+disp(strain);
+disp(stress);
+disp(N);
+disp(R);
+
+pause;
                                                         
 %--- Plot results --------------------------------------------------------%                                                        
 PlotStructure(X,IX,ne,neqn,bound,loads,D,stress)        % Plot structure
@@ -58,7 +67,7 @@ return
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Build global stiffness matrix %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [K]=buildstiff(X,IX,ne,mprop,K)
+function [K,Bs,Ls]=buildstiff(X,IX,ne,mprop,K,Ls,Bs)
 
 % This subroutine builds the global stiffness matrix from
 % the local element stiffness matrices
@@ -74,11 +83,13 @@ for e=1:ne
     p1 = X(idx_node_1, :);
     p2 = X(idx_node_2, :);
     l_original = norm(p2 - p1);
+    Ls(e) = l_original;
     dx = p2(1) - p1(1);
     dy = p2(2) - p1(2);
     %%% assembly
     % strain displacement vector
     B_0 = 1 / l_original^2 * [-dx; -dy; dx; dy];
+    Bs(:, e) = B_0;
     % element stiffness matrix
     k_elem = emod * area * l_original * (B_0 * B_0.');
     % index of dofs (for assembly)
@@ -109,18 +120,27 @@ return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%% Calculate element strain and stress %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [strain,stress]=recover(mprop,X,IX,D,ne,strain,stress)
+function [strain,stress,N,R]=recover(mprop,X,IX,D,ne,Bs,N,R,Ls,P,strain,stress)
 
 % This subroutine recovers the element stress, element strain, 
 % and nodal reaction forces
-
-
         
-for e=1:ne
-    disp('ERROR in fea/recover: calculate strain and stress')
-end
-pause
-
+    for e=1:ne
+        idx_prop = IX(e, 3);
+        idx_dofs = [IX(e, 1) * 2 - 1, IX(e, 1) * 2, IX(e, 2) * 2 - 1, IX(e, 2) * 2];
+        % element strain
+        eps = Bs(:, e).' * D(idx_dofs);
+        strain(e) = eps;
+        % element stress
+        sig = mprop(idx_prop, 1) * eps;
+        stress(e) = sig;
+        % element forces
+        force = sig * mprop(idx_prop, 2);
+        N(e) = force;
+        % reaction forces
+        R(idx_dofs) = R(idx_dofs) + Bs(:, e) * N(e) * Ls(e);
+    end
+    R = R - P;
 return
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
