@@ -9,7 +9,8 @@ clc
 
 %--- Input file ----------------------------------------------------------%
 % example1                % Input file
-test1                   % Input file
+% test1                   % Input file
+exercise_1                % Input file
 
 neqn = size(X,1)*size(X,2);         % Number of equations
 ne = size(IX,1);                    % Number of elements
@@ -37,17 +38,8 @@ Bs = zeros(4, ne);                      % Collected strain displacement vectors
 
 D = Kmatr \ P;                              % Solve system of equations
 
-disp(D);
-pause;
-
 [strain,stress,N,R]=recover(mprop,X,IX,D,ne,Bs,N,R,Ls,P,strain,stress); % Calculate element 
                                                                         % stress and strain
-disp(strain);
-disp(stress);
-disp(N);
-disp(R);
-
-pause;
                                                         
 %--- Plot results --------------------------------------------------------%                                                        
 PlotStructure(X,IX,ne,neqn,bound,loads,D,stress)        % Plot structure
@@ -161,8 +153,14 @@ for e = 1:ne
     edof = [2*IX(e,1)-1 2*IX(e,1) 2*IX(e,2)-1 2*IX(e,2)];
     xx = xx + D(edof(1:2:4));
     yy = yy + D(edof(2:2:4));
-    
-    h2=plot(xx,yy,'b','LineWidth',3.5);    
+    sig = stress(e);
+    if sig > 0
+        h2 = plot(xx,yy,'b','LineWidth',3.5);
+    elseif sig < 0
+        h2 = plot(xx,yy,'r','LineWidth',3.5);
+    else
+        h2 = plot(xx,yy,'g','LineWidth',3.5);
+    end
 end
 plotsupports
 plotloads
