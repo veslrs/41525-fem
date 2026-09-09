@@ -10,7 +10,8 @@ clc
 %--- Input file ----------------------------------------------------------%
 % example1                % Input file
 % test1                   % Input file
-exercise_1                % Input file
+% exercise_1                % Input file
+group10                % Input file
 
 neqn = size(X,1)*size(X,2);         % Number of equations
 ne = size(IX,1);                    % Number of elements
@@ -101,12 +102,16 @@ return
 
 function [K,P]=enforce(K,P,bound)
     idx_dofs = ((bound(:, 1) - 1) * 2 + bound(:, 2)).';
+    us = bound(:, 3);
+    P = P - K(:, idx_dofs) * us;
     K(idx_dofs, :) = 0;
     K(:, idx_dofs) = 0;
+    idx = 0;
     for i = idx_dofs
+        idx = idx + 1;
         K(i, i) = 1;
+        P(i) = us(idx);
     end
-    P(idx_dofs) = bound(:, 3);
 return
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
