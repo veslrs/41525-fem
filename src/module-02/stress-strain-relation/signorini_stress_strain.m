@@ -1,0 +1,6 @@
+function stresses = signorini_stress_strain(strains, c1, c2, c3, c4)
+    lambda = 1 + c4 * strains;
+    stresses = c1 * (lambda - lambda.^-2) ...
+        + c2 * (1 - lambda.^-3) ...
+        + c3 * (1 - 3 * lambda + lambda.^3 - 2 * lambda.^-3 + 3 * lambda.^-2);
+end
