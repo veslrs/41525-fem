@@ -1,6 +1,9 @@
-function [P, D, Ls, Bs] = linear(P, loads, X, IX, nelem, mprop, K, Ls, Bs, bound)
-    P = build_load(P,loads);       % Build global load vector
-    [K, Bs, Ls] = build_global_stiffness("linear", X, IX, nelem, mprop, K, Ls, Bs);    % Build global stiffness matrix
-    [K, P]=enforce(K, P, bound);           % Enforce boundary conditions
-    D = K \ P;                              % Solve system of equations
+function [P, D, Ls, Bs] = linear(loads, X, IX, nelem, neqn, mprop, bound)
+    % global load vec
+    P = build_load(neqn,loads);
+    % global stiffness mat
+    [K, Bs, Ls] = build_global_stiffness("linear", X, IX, nelem, neqn, mprop);
+    % BCs
+    [K, P]=enforce(K, P, bound);
+    D = K \ P;
 end

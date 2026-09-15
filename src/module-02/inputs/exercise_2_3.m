@@ -1,13 +1,16 @@
-%%% input file, exercise 2.1, week 2
-%%% zeyfa, 09 Sept, 2026
+%%% input file, exercise 2.3, week 2
+%%% zeyfa, 10 Sept, 2026
 
 % Problem definition
 problem = "nonlinear";              % linear | nonlinear
-algorithm = "euler";          % euler | euler-corr | nr | nr-modified
+algorithm = "nr";          % euler | euler-corr | nr | nr-modified
 factorization = "lu";         % lu | cholesky
 
 % Number of increments
 nincr = 20;
+
+% Number of iterations per increment
+iter_max = 100;
 
 % Coordinates of 3 nodes,
 X = [  0.00  0.00 

@@ -1,8 +1,9 @@
 %%% Build global stiffness matrix
 %%% zeyfa, 09 Sept 2026
-function [K,Bs,Ls] = build_global_stiffness(problem, X, IX, nelem, mprop, K, Ls, Bs, D)
-    disp(size(K));
-    K = zeros(size(K));
+function [K,Bs,Ls] = build_global_stiffness(problem, X, IX, nelem, neqn, mprop, D)
+    K=sparse(neqn,neqn);                % Stiffness matrix
+    Bs = zeros(4, nelem);               % Collected strain displacement vectors
+    Ls = zeros(nelem, 1);               % Element initial lengths vector
     for e=1:nelem
         idx_prop = IX(e, 3);
         idx_node_1 = IX(e, 1);
@@ -28,7 +29,7 @@ function [K,Bs,Ls] = build_global_stiffness(problem, X, IX, nelem, mprop, K, Ls,
             emod = mprop(idx_prop, 1);
         elseif strcmpi(problem, "nonlinear")
             epsilon = Bs(:, e).' * D(idx_dofs);
-            emod = signorini(e, IX, mprop, epsilon);
+            emod = signorini_strain_to_emod(e, IX, mprop, epsilon);
         else
             error("Please pass the correct argument for problem type: linear | nonlinear.");
         end

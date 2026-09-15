@@ -1,9 +1,9 @@
-%%% input file, exercise 2.1, week 2
+%%% input file, exercise 2.2, week 2
 %%% zeyfa, 09 Sept, 2026
 
 % Problem definition
 problem = "nonlinear";              % linear | nonlinear
-algorithm = "euler";          % euler | euler-corr | nr | nr-modified
+algorithm = "euler-corr";          % euler | euler-corr | nr | nr-modified
 factorization = "lu";         % lu | cholesky
 
 % Number of increments
