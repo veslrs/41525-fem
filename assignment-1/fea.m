@@ -19,7 +19,7 @@ function fea(input_path)
     
     fprintf(1, "[INFO] Number of elements: %d\n", nelem);
     fprintf(1, "[INFO] Number of DOFs: %d\n", neqn);
-    if strcmpi(problem, "nonlinear")
+    if nonlinearity
         fprintf(1, "[INFO] Number of iterations: %d\n", nincr);
     end
     
@@ -28,7 +28,14 @@ function fea(input_path)
         % solve
         [P, D, Ls, Bs] = linear(loads, X, IX, nelem, neqn, mprop, bound);
         % Post-processing
-        [~ ,stress, ~, ~]=recover_all(problem, mprop,IX,D,nelem,neqn,Bs,Ls,P);
+        [~ ,stress, ~, ~]=recover_all(nonlinearity, mprop,IX,D,nelem,neqn,Bs,Ls,P);
+        disp("displacements at C:");
+        disp(D(29:30));
+        disp("Max stresses:");
+        disp(max(stress));
+        disp(min(stress));
+        disp(stress);
+        pause;
         plot_structure(X,IX,nelem,neqn,bound,loads,D,stress);
     elseif material_nonlinearity == true && geometrical_nonlinearity == false
         if strcmpi(algorithm, "euler")

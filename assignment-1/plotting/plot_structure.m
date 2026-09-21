@@ -2,6 +2,8 @@
 %%% zeyfa, 09 Sept 2026
 function plot_structure(X,IX,nelem,neqn,bound,loads,D,stress)
     h1=0;h2=0;
+    f = figure;
+    f.Position(3:4) = [400 400];
     % Plotting Un-Deformed and Deformed Structure
     clf
     hold on
@@ -26,9 +28,11 @@ function plot_structure(X,IX,nelem,neqn,bound,loads,D,stress)
     plotloads
     
     legend([h1 h2],{'Undeformed state',...
-        'Deformed state'})
+        'Deformed state'}, FontSize=12, Location="se");
+    xlabel("$x$ [mm]", "Interpreter","latex", FontSize=12);
+    ylabel("$y$ [mm]", "Interpreter","latex", FontSize=12);
     
     axis equal;
     hold off
-    
+    % exportgraphics(f, 'ex_1_6.pdf', 'ContentType', 'vector');
 end

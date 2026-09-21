@@ -1,7 +1,7 @@
 %%% This subroutine recovers the element stress, element strain, 
 %%% and nodal reaction forces
 %%% zeyfa, 09 Sept 2026
-function [strain,stress,N,R] = recover_all(problem, mprop,IX,D,nelem,neqn,Bs,Ls,P)
+function [strain,stress,N,R] = recover_all(nonlinearity, mprop,IX,D,nelem,neqn,Bs,Ls,P)
     strain=zeros(nelem,1);                     % Element strain vector 
     stress=zeros(nelem,1);                     % Element stress vector
     N=zeros(nelem,1);                          % Element force vector
@@ -13,14 +13,14 @@ function [strain,stress,N,R] = recover_all(problem, mprop,IX,D,nelem,neqn,Bs,Ls,
         eps = Bs(:, e).' * D(idx_dofs);
         strain(e) = eps;
         % element stress
-        if strcmpi(problem, "linear")
+        if nonlinearity == false
             sig = mprop(idx_prop, 1) * eps;
             stress(e) = sig;
-        elseif strcmpi(problem, "nonlinear")
+        elseif nonlinearity == true
             sig = signorini_strains_to_stresses(eps, e, IX, mprop);
             stress(e) = sig;
         else
-            error("Please pass the correct argument for problem type: linear | nonlinear.");
+            error("Please pass the correct argument for problem type: nonlinearity = true | false.");
         end
         % element forces
         force = sig * mprop(idx_prop, 2);
