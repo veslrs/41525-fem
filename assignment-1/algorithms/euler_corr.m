@@ -1,6 +1,6 @@
 %%% Euler with one-step correction
 %%% zeyfa, 10 Sept 2026
-function [Ds] = euler_corr(problem, nelem, neqn, nincr, loads, bound, X, IX, mprop)
+function [Ds] = euler_corr(nonlinearity, nelem, neqn, nincr, loads, bound, X, IX, mprop)
     % Displacement vector
     D=zeros(neqn,1);
     % Collection of displacement vectors
@@ -13,7 +13,7 @@ function [Ds] = euler_corr(problem, nelem, neqn, nincr, loads, bound, X, IX, mpr
         dp = dp_incr;
         p = p + dp;
         % calculate k_t
-        [K, Bs, Ls] = build_global_stiffness(problem, X, IX, nelem, neqn, mprop, D);
+        [K, Bs, Ls] = build_global_stiffness(nonlinearity, X, IX, nelem, neqn, mprop, D);
         % enforce BCs on K and (dP - R)
         rhs = dp - R;
         [K, rhs] = enforce(K, rhs, bound);
@@ -22,6 +22,6 @@ function [Ds] = euler_corr(problem, nelem, neqn, nincr, loads, bound, X, IX, mpr
         D = D + dD;
         Ds(:, i) = D;
         % one-step correction
-        [~,~,~,R] = recover_all(problem, mprop,IX,D,nelem,neqn,Bs,Ls,p);
+        [~,~,~,R] = recover_all(nonlinearity, mprop,IX,D,nelem,neqn,Bs,Ls,p);
     end
 end

@@ -2,7 +2,9 @@
 %%% zeyfa, 10 Sept, 2026
 
 % Problem definition
-problem = "nonlinear";              % linear | nonlinear
+nonlinearity = true;
+material_nonlinearity = true;
+geometrical_nonlinearity = false;
 algorithm = "nr";          % euler | euler-corr | nr | nr-modified
 factorization = "lu";         % lu | cholesky
 
@@ -11,6 +13,9 @@ nincr = 20;
 
 % Number of iterations per increment
 iter_max = 100;
+
+% Termination
+eSTOP = 1e-8;
 
 % Coordinates of 3 nodes,
 X = [  0.00  0.00 

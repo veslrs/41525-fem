@@ -1,6 +1,6 @@
 %%% Build global stiffness matrix
 %%% zeyfa, 09 Sept 2026
-function [K,Bs,Ls] = build_global_stiffness(problem, X, IX, nelem, neqn, mprop, D)
+function [K,Bs,Ls] = build_global_stiffness(nonlinearity, X, IX, nelem, neqn, mprop, D)
     K=sparse(neqn,neqn);                % Stiffness matrix
     Bs = zeros(4, nelem);               % Collected strain displacement vectors
     Ls = zeros(nelem, 1);               % Element initial lengths vector
@@ -25,13 +25,13 @@ function [K,Bs,Ls] = build_global_stiffness(problem, X, IX, nelem, neqn, mprop, 
         % cross-section
         area = mprop(idx_prop, 2);
         % e-modulus
-        if strcmpi(problem, "linear")
+        if nonlinearity == false
             emod = mprop(idx_prop, 1);
-        elseif strcmpi(problem, "nonlinear")
+        elseif nonlinearity == true
             epsilon = Bs(:, e).' * D(idx_dofs);
             emod = signorini_strain_to_emod(e, IX, mprop, epsilon);
         else
-            error("Please pass the correct argument for problem type: linear | nonlinear.");
+            error("Please pass the correct argument for problem type: nonlinearity = true | false.");
         end
         % element stiffness matrix
         k_elem = emod * area * l_original * (B_0 * B_0.');

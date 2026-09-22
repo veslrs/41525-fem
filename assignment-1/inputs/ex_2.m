@@ -7,11 +7,17 @@
 close all
 clc
 
+% Problem definition
+nonlinearity = true;
+material_nonlinearity = true;
+geometrical_nonlinearity = false;
+algorithm = "nr-modified";          % euler | euler-corr | nr | nr-modified
+factorization = "lu";         % lu | cholesky
+
 nincr=18;
 eSTOP=10^(-8);
-i_max=1000;
+iter_max=1000;
 Pfinal=100;
-
 
 % Node coordinates: x, y
 X = [

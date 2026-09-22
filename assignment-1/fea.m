@@ -7,6 +7,8 @@
 %%%
 %%% zeyfa, 20 Sept 2026: modified control flow handling both mat and geom
 %%% non-linearity.
+%%% 
+%%% zeyfa, 22 Sept 2026: modified control flow; updated function calls.
 %%% =======================================================================
 function fea(input_path)
     close all;
@@ -24,68 +26,37 @@ function fea(input_path)
     end
     
     %%% Solve
-    if nonlinearity == false
+    if nonlinearity ~= true
         % solve
         [P, D, Ls, Bs] = linear(loads, X, IX, nelem, neqn, mprop, bound);
         % Post-processing
         [~ ,stress, ~, ~]=recover_all(nonlinearity, mprop,IX,D,nelem,neqn,Bs,Ls,P);
-        disp("displacements at C:");
-        disp(D(29:30));
-        disp("Max stresses:");
-        disp(max(stress));
-        disp(min(stress));
-        disp(stress);
-        pause;
         plot_structure(X,IX,nelem,neqn,bound,loads,D,stress);
-    elseif material_nonlinearity == true && geometrical_nonlinearity == false
-        if strcmpi(algorithm, "euler")
-            % displacements
-            Ds = euler(problem, nelem, neqn, nincr, loads, bound, X, IX, mprop);
-            % post-processing
-            plot_force_disp(Ds, IX, mprop, nincr, loads);
-        elseif strcmpi(algorithm, "euler-corr")
-            % displacements
-            Ds = euler_corr(problem, nelem, neqn, nincr, loads, bound, X, IX, mprop);
-            % post-processing
-            plot_force_disp(Ds, IX, mprop, nincr, loads);
-        elseif strcmpi(algorithm, "nr")
-            % displacements
-            Ds = nr(problem, nelem, neqn, nincr, iter_max, loads, bound, X, IX, mprop, 1e-8);
-            % post-processing
-            plot_force_disp(Ds, IX, mprop, nincr, loads);
-        elseif strcmpi(algorithm, "nr-modified")
-            % displacements
-            Ds = nr_modified(problem, factorization, nelem, neqn, nincr, iter_max, loads, bound, X, IX, mprop, 1e-8);
-            % post-processing
-            plot_force_disp(Ds, IX, mprop, nincr, loads);
-        else
-            error("Please pass the correct argument for algorithm: euler | euler-corr | nr | nr-modified.")
-        end
-    elseif material_nonlinearity == false && geometrical_nonlinearity == true
-        if strcmpi(algorithm, "euler")
-            % displacements
-            Ds = euler(problem, nelem, neqn, nincr, loads, bound, X, IX, mprop);
-            % post-processing
-            plot_force_disp(Ds, IX, mprop, nincr, loads);
-        elseif strcmpi(algorithm, "euler-corr")
-            % displacements
-            Ds = euler_corr(problem, nelem, neqn, nincr, loads, bound, X, IX, mprop);
-            % post-processing
-            plot_force_disp(Ds, IX, mprop, nincr, loads);
-        elseif strcmpi(algorithm, "nr")
-            % displacements
-            Ds = nr(problem, nelem, neqn, nincr, iter_max, loads, bound, X, IX, mprop, 1e-8);
-            % post-processing
-            plot_force_disp(Ds, IX, mprop, nincr, loads);
-        elseif strcmpi(algorithm, "nr-modified")
-            % displacements
-            Ds = nr_modified(problem, factorization, nelem, neqn, nincr, iter_max, loads, bound, X, IX, mprop, 1e-8);
-            % post-processing
-            plot_force_disp(Ds, IX, mprop, nincr, loads);
-        else
-            error("Please pass the correct argument for algorithm: euler | euler-corr | nr | nr-modified.")
-        end
+    elseif strcmpi(algorithm, "euler")
+        % displacements
+        Ds = euler(nonlinearity, nelem, neqn, nincr, loads, bound, X, IX, mprop);
+        % post-processing
+        % plot_force_disp(Ds, IX, mprop, nincr, loads);
+        writematrix(Ds, "disps_euler.csv");
+    elseif strcmpi(algorithm, "euler-corr")
+        % displacements
+        Ds = euler_corr(nonlinearity, nelem, neqn, nincr, loads, bound, X, IX, mprop);
+        % post-processing
+        % plot_force_disp(Ds, IX, mprop, nincr, loads);
+        writematrix(Ds, "disps_euler_corr.csv");
+    elseif strcmpi(algorithm, "nr")
+        % displacements
+        Ds = nr(nonlinearity, nelem, neqn, nincr, iter_max, loads, bound, X, IX, mprop, eSTOP);
+        % post-processing
+        % plot_force_disp(Ds, IX, mprop, nincr, loads);
+        writematrix(Ds, "disps_nr.csv");
+    elseif strcmpi(algorithm, "nr-modified")
+        % displacements
+        Ds = nr_modified(nonlinearity, factorization, nelem, neqn, nincr, iter_max, loads, bound, X, IX, mprop, eSTOP);
+        % post-processing
+        % plot_force_disp(Ds, IX, mprop, nincr, loads);
+        writematrix(Ds, "disps_nr_modified.csv");
     else
-        error("Combined material and geometrical non-linearity is not implemented yet.");
+        error("Please pass the correct argument for algorithm: euler | euler-corr | nr | nr-modified.")
     end
 end

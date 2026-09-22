@@ -2,7 +2,9 @@
 %%% zeyfa, 09 Sept, 2026
 
 % Problem definition
-problem = "nonlinear";              % linear | nonlinear
+nonlinearity = true;
+material_nonlinearity = true;
+geometrical_nonlinearity = false;
 algorithm = "euler-corr";          % euler | euler-corr | nr | nr-modified
 factorization = "lu";         % lu | cholesky
 

@@ -1,6 +1,6 @@
 %%% Euler
 %%% zeyfa, 09 Sept 2026
-function [Ds] = euler(problem, nelem, neqn, nincr, loads, bound, X, IX, mprop)
+function [Ds] = euler(nonlinearity, nelem, neqn, nincr, loads, bound, X, IX, mprop)
     % Displacement vector
     D=zeros(neqn,1);
     % Collection of displacement vectors
@@ -11,7 +11,7 @@ function [Ds] = euler(problem, nelem, neqn, nincr, loads, bound, X, IX, mprop)
     for i = 1:nincr
         p = p + dp_incr;
         % calculate k_t
-        [K, ~, ~] = build_global_stiffness(problem, X, IX, nelem, neqn, mprop, D);
+        [K, ~, ~] = build_global_stiffness(nonlinearity, X, IX, nelem, neqn, mprop, D);
         % enforce BCs on K and dP
         dp = dp_incr;
         [K, dp] = enforce(K, dp, bound);
