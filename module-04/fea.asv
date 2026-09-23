@@ -41,8 +41,8 @@ sig_eps = zeros(ne,1);
 
 %%% parameters to change
 V = 10;                                 % Max material volume
-p = 1;                                % Penalization factor
-eta = 0.5;                              % damping factor
+p = 1.75;                                % Penalization factor
+eta = 1;                              % damping factor
 tol = 1e-6;                             % Termination condition
 max_iopt = 1e5;
 %%%
